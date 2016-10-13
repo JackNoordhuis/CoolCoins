@@ -17,10 +17,10 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class GetCoinsCommand extends CoolCoinsCommand {
+class GetCoinsCommand extends CoolCoinsUniversalCommand {
 
 	public function __construct(Main $plugin) {
-		parent::__construct($plugin, "getcoins", "Get a players coin balance", "/getcoins {name}", ["coins", "viewcoins", "money", "balance"]);
+		parent::__construct($plugin, "getcoins", "Get a players coin balance", "/getcoins {name}", ["coins", "viewcoins", "money", "balance", "mymoney"]);
 	}
 
 	public function onCommand(CommandSender $sender, array $args) {
@@ -33,11 +33,11 @@ class GetCoinsCommand extends CoolCoinsCommand {
 					return true;
 				}
 			}
-			// add some fancy provider task shiz
-		} else {
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-			return true;
+
+			$this->getPlugin()->getProvider()->viewCoins($args[0], $sender);
 		}
+		$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+		return true;
 	}
 
 }

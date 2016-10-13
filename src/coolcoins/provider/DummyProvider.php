@@ -32,7 +32,7 @@ abstract class DummyProvider implements Provider {
 	}
 
 	/**
-	 * Actions to execute when the class is enabled
+	 * Actions to execute when the provider is enabled
 	 */
 	protected abstract function init();
 

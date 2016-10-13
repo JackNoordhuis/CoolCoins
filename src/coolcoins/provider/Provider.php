@@ -10,6 +10,8 @@
 
 namespace coolcoins\provider;
 
+use pocketmine\Player;
+
 /**
  * CoolCoins Provider Interface
  */
@@ -24,17 +26,16 @@ interface Provider {
 	public function createSave($player, $coins = 0);
 
 	/**
-	 * Get a players coins
+	 * Get a players saved coins and store them
 	 *
-	 * @param string $player
-	 * @return int
+	 * @param string|Player $player
 	 */
 	public function loadSave($player);
 
 	/**
 	 * Update a players coins
 	 *
-	 * @param string $player
+	 * @param string|Player $player
 	 * @param int $coins
 	 */
 	public function updateSave($player, $coins = 0);
@@ -42,8 +43,21 @@ interface Provider {
 	/**
 	 * Delete a players save
 	 *
-	 * @param $player
+	 * @param string|Player
 	 */
 	public function deleteSave($player);
+
+	/**
+	 * @param string|Player $player
+	 * @param string|Player $sender
+	 */
+	public function viewCoins($player, $sender);
+
+	/**
+	 * @param string|Player $player
+	 * @param string|Player $sender
+	 * @param int $page
+	 */
+	public function viewTop($player, $sender, $page);
 
 }

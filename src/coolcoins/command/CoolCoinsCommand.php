@@ -49,7 +49,7 @@ abstract class CoolCoinsCommand extends Command implements PluginIdentifiableCom
 	 * @return bool
 	 */
 	public function execute(CommandSender $sender, $commandLabel, array $args) {
-		return $this->onCommand($sender, $args);
+		return $this->checkSender($sender, $args);
 	}
 
 	/**
@@ -58,6 +58,6 @@ abstract class CoolCoinsCommand extends Command implements PluginIdentifiableCom
 	 * 
 	 * @return bool
 	 */
-	public abstract function onCommand(CommandSender $sender, array $args);
+	public abstract function checkSender(CommandSender $sender, array $args);
 
 }

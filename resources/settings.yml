@@ -1,16 +1,19 @@
-# CoolCoins v0.0.1 - settings.yml config file
+# CoolCoins v0.0.1 - Settings.yml config file
 #
 # Basic settings
 basic-settings:
   # Which provider should we use?
   # Currently only has MySQL implemented
   provider: mysql
+  # Should we use a local provider if we can't connect to a database?
+  strict-provider: false
   # How mnay coins should a player start with?
   starting-coins: 1000
-# MySQL database
+# MySQL database info
 database:
-  host: "yourhost.com"
+  host: "localhost"
   user: "root"
-  password: ""
-  name: "coolcoins"
+  password: "root"
+  schema: "test"
+  table: "coolcoins"
   port: 3306

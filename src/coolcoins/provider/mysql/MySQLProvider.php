@@ -13,30 +13,22 @@ namespace coolcoins\provider\mysql;
 use coolcoins\provider\DummyProvider;
 use coolcoins\provider\mysql\task\MySQLCreateCoinsSaveTask;
 use coolcoins\provider\mysql\task\MySQLDeleteCoinsSaveTask;
+use coolcoins\provider\mysql\task\MySQLInitRequest;
 use coolcoins\provider\mysql\task\MySQLLoadCoinsTask;
 use coolcoins\provider\mysql\task\MySQLUpdateCoinsTask;
+use pocketmine\Player;
 
 class MySQLProvider extends DummyProvider {
 
 	/** @var MySQLCredentials */
 	private $credentials;
 
+	/**
+	 * Initial connection with database, check connection and create tables
+	 */
 	public function init() {
-		$this->credentials = MySQLCredentials::fromArray($this->getPlugin()->settings["database"]);
-		$mysqli = $this->credentials->getMysqli();
-		if($mysqli->connect_error) {
-			$this->getPlugin()->getLogger()->critical("Could not connect to CoolCoins database! Error: " . $mysqli->connect_error);
-			$mysqli->close();
-			return;
-		}
-		$mysqli->query("CREATE TABLE IF NOT EXISTS coolcoins (
-			username VARCHAR(63) PRIMARY KEY,
-			coins INT
-		)");
-		if(isset($mysqli->error) and $mysqli->error) {
-			throw new \RuntimeException($mysqli->error);
-		}
-		$mysqli->close();
+		$this->credentials = MySQLCredentials::fromArray($this->getPlugin()->getSettings()->getNested("database"));
+		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLInitRequest($this));
 	}
 
 	/**
@@ -46,20 +38,59 @@ class MySQLProvider extends DummyProvider {
 		return $this->credentials;
 	}
 
+	/**
+	 * @param string|Player $player
+	 * @param int $coins
+	 */
 	public function createSave($player, $coins = 0) {
+		if($player instanceof Player) $player = $player->getName();
 		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLCreateCoinsSaveTask($this, $player, $coins));
 	}
 
+	/**
+	 * @param string|Player $player
+	 */
 	public function loadSave($player) {
+		if($player instanceof Player) $player = $player->getName();
 		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLLoadCoinsTask($this, $player));
 	}
 
+	/**
+	 * @param string|Player $player
+	 * @param int $coins
+	 */
 	public function updateSave($player, $coins = 0) {
+		if($player instanceof Player) $player = $player->getName();
 		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLUpdateCoinsTask($this, $player, $coins));
 	}
 
+	/**
+	 * @param string|Player $player
+	 */
 	public function deleteSave($player) {
+		if($player instanceof Player) $player = $player->getName();
 		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLDeleteCoinsSaveTask($this, $player));
+	}
+
+	/**
+	 * @param Player|string $player
+	 * @param Player|string $sender
+	 */
+	public function viewCoins($player, $sender) {
+//		if($player instanceof Player) $player = $player->getName();
+//		if($sender instanceof Player) $sender = $sender->getName();
+//		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLViewCoinsTask($this, $player));
+	}
+
+	/**
+	 * @param Player|string $player
+	 * @param Player|string $sender
+	 * @param int $page
+	 */
+	public function viewTop($player, $sender, $page = 1) {
+//		if($player instanceof Player) $player = $player->getName();
+//		if($sender instanceof Player) $sender = $sender->getName();
+//		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new MySQLViewCoinsTask($this, $player));
 	}
 
 }

@@ -1,0 +1,12 @@
+# CoolCoins v0.0.1 - settings.yml config file
+#
+# Messages
+
+# Messages shown when the console is in debug mode
+# Youc can edit these to make detecting errors easier
+debug:
+  # {args1} = short class name, example: MySQLRequest
+  # {args2} = table name, example: coolcoins
+  error: "mysqli error while executing {args1} on {args2} database!"
+  connection: "mysqli connection error while executing {args1} on {args2} database!"
+  success: "Successfully completed {args1} on {args2} database!"

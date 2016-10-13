@@ -23,7 +23,10 @@ class MySQLCredentials {
 	public $password;
 
 	/** @var string */
-	public $name;
+	public $schema;
+
+	/** @var string */
+	public $table;
 
 	/** @var int */
 	public $port;
@@ -40,7 +43,8 @@ class MySQLCredentials {
 		$instance->host = $array["host"];
 		$instance->user = $array["user"];
 		$instance->password = $array["password"];
-		$instance->name = $array["name"];
+		$instance->schema = $array["schema"];
+		$instance->table = $array["table"];
 		$instance->port = $array["port"];
 		return $instance;
 	}
@@ -51,7 +55,7 @@ class MySQLCredentials {
 	 * @return \mysqli
 	 */
 	public function getMysqli() {
-		return new \mysqli($this->host, $this->user, $this->password, $this->name, $this->port);
+		return new \mysqli($this->host, $this->user, $this->password, $this->schema, $this->port);
 	}
 
 }

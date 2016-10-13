@@ -8,14 +8,15 @@
  * @author Jack
  */
 
-
 namespace coolcoins\command;
 
+use coolcoins\CoinHolder;
 use coolcoins\Main;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class SetCoinsCommand extends CoolCoinsCommand {
+class SetCoinsCommand extends CoolCoinsUniversalCommand {
 
 	public function __construct(Main $plugin) {
 		parent::__construct($plugin, "setcoins", "Set a players coin balance", "/setcoins {name} {amount}", ["setbal", "setmoney", "setbalance"]);
@@ -25,15 +26,16 @@ class SetCoinsCommand extends CoolCoinsCommand {
 		if(isset($args[1])) {
 			$name = (string)$args[0];
 			$coins = (int)$args[1];
-			if(!is_string($name) or !is_int($coins)) {
-				$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-				return true;
+			$target = $this->getPlugin()->getServer()->getPlayer($name);
+			if($target instanceof Player) {
+				$holder = $this->getPlugin()->getCoinHolder($target);
+				if($holder instanceof CoinHolder) {
+					$sender->sendMessage("Coins: {$holder->getCoins()}");
+				}
 			}
-			$this->getPlugin()->getProvider()->updateSave($name, (int)$coins);
-			return true;
-		} else {
-			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-			return true;
+
 		}
+		$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+		return true;
 	}
 }

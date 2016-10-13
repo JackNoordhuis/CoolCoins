@@ -13,6 +13,7 @@ namespace coolcoins;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 
 class EventListener implements Listener {
 
@@ -45,7 +46,19 @@ class EventListener implements Listener {
 	 */
 	public function onJoin(PlayerLoginEvent $event) {
 		$player = $event->getPlayer();
-		$this->plugin->getProvider()->loadSave($player->getName());
+		$this->plugin->startCoinHolder($player, 0, true);
+	}
+
+	/**
+	 * Load all the coins!
+	 *
+	 * @param PlayerQuitEvent $event
+	 *
+	 * @priority MONITOR
+	 */
+	public function onQuit(PlayerQuitEvent $event) {
+		$player = $event->getPlayer();
+		$this->getPlugin()->closeCoinHolder($player);
 	}
 
 }

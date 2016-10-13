@@ -13,8 +13,10 @@ namespace coolcoins\provider\mysql\task;
 
 use coolcoins\Main;
 use coolcoins\provider\mysql\MySQLProvider;
+use coolcoins\provider\mysql\MySQLTask;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\PluginException;
 use pocketmine\utils\TextFormat;
 
 /**
@@ -46,28 +48,47 @@ class MySQLUpdateCoinsTask extends MySQLTask {
 	 */
 	public function onRun() {
 		$mysqli = $this->getMysqli();
-		$mysqli->query("UPDATE coolcoins SET coins = {$this->coins} WHERE username = {$mysqli->escape_string($this->player)}");
-		if(count($mysqli->affected_rows) > 0) {
-			$this->setResult(false);
-		}
-		$mysqli->close();
+		$stmt = $mysqli->stmt_init();
+		$stmt->prepare("UPDATE coolcoins SET coins = ? WHERE username = ?");
+		$stmt->bind_param("is", $this->coins, $mysqli->escape_string($this->player));
+		$stmt->execute();
+		if($this->checkError($stmt)) return;
+		if($this->checkAffectedRows($stmt)) return;
+		$this->setResult(self::SUCCESS);
 	}
 
 	/**
 	 * @param Server $server
 	 */
 	public function onCompletion(Server $server) {
-		$coolCoins = $server->getPluginManager()->getPlugin("CoolCoins");
-		$player = $server->getPlayer($this->player);
-		if($coolCoins instanceof Main) {
-			if($this->getResult() !== false) {
-				$coolCoins->getLogger()->debug(TextFormat::YELLOW . "Saved coins for " . $this->player);
-				if($player instanceof Player) {
-					$coolCoins->updateCoinHolder($player, $this->coins);
+		$plugin = $this->getPlugin($server);
+		if($plugin instanceof Main and $plugin->isEnabled()) {
+			$player = $server->getPlayerExact($this->player);
+			if($player instanceof Player) {
+				$result = $this->getResult();
+				switch((is_array($result) ? $result[0] : $result)) {
+					case self::CONNECTION_ERROR:
+						$server->getLogger()->debug("Failed to complete UpdateCoinsTask for coolcoins database due to a connection error. Error: {$result[1]}");
+						throw new \RuntimeException($result[1]);
+					case self::SUCCESS:
+						$server->getLogger()->debug("Successfully completed UpdateCoinsTask for coolcoins database! User: {$this->player}");
+						return;
+					case self::NO_DATA:
+					case self::NO_CHANGE:
+						$plugin->getProvider()->createSave($player, $this->coins);
+						$server->getLogger()->debug("Failed to complete UpdateCoinsTask for coolcoins database due the username not being registered! User: {$this->player}");
+						return;
+					case self::MYSQLI_ERROR:
+						$server->getLogger()->debug("Failed to complete UpdateCoinsTask for coolcoins database due to a mysqli error. Error: {$result[1]}");
+						throw new \RuntimeException($result[1]);
 				}
 			} else {
-				$coolCoins->getProvider()->createSave($this->player, $this->coins);
+				$server->getLogger()->debug("Failed to complete UpdateCoinsTask for coolcoins database due to user not being online! User: {$this->player}");
+				return;
 			}
+		} else {
+			$server->getLogger()->debug("Attempted to complete UpdateCoinsTask for coolcoins database while CoolCoins plugin isn't enabled! User: {$this->player}");
+			throw new PluginException("CoolCoins plugin isn't enabled!");
 		}
 	}
 
