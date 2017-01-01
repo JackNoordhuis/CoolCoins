@@ -7,6 +7,6 @@
 debug:
   # {args1} = short class name, example: MySQLRequest
   # {args2} = table name, example: coolcoins
-  error: "mysqli error while executing {args1} on {args2} database!"
-  connection: "mysqli connection error while executing {args1} on {args2} database!"
+  error: "mysql error while executing {args1} on {args2} database!"
+  connection: "mysql connection error while executing {args1} on {args2} database!"
   success: "Successfully completed {args1} on {args2} database!"
