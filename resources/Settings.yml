@@ -2,18 +2,18 @@
 #
 # Basic settings
 basic-settings:
-  # Which provider should we use?
-  # Currently only has MySQL implemented
-  provider: mysql
-  # Should we use a local provider if we can't connect to a database?
-  strict-provider: false
-  # How mnay coins should a player start with?
+  # How many coins should a player start with?
   starting-coins: 1000
 # MySQL database info
-database:
-  host: "localhost"
-  user: "root"
-  password: "root"
-  schema: "test"
-  table: "coolcoins"
-  port: 3306
+storage:
+  # The maximum number of simultaneous SQL queries
+  # Recommended: 1 for sqlite, 2 for MySQL. You may want to further increase this value if your MySQL connection is very slow.
+  worker-limit: 1
+  # What storage provider should we use?
+  provider: mysql
+  mysql:
+    host: localhost
+    user: root
+    password: "oot
+    schema: test
+    port: 3306
