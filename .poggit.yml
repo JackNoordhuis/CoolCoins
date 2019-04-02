@@ -3,5 +3,4 @@ branches: master
 projects:
   CoolCoins:
     path: ""
-    model: default
 ...
